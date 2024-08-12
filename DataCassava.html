@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แสดงข้อมูลแปลงมันสำปะหลัง</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        nav.navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar li {
+            margin-right: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+        .navbar a:hover, .navbar a.active {
+            color: #e2e8f0;
+            background-color: #2d3748;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+        .header .add-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .header .add-button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            color: #2d3748;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .edit-button {
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+        }
+        .edit-button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #e53935;
+        }
+        .image-cell img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        .modal-content h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .modal-content label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .modal-content input[type="text"],
+        .modal-content input[type="number"],
+        .modal-content input[type="file"],
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .modal-content #map {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 15px;
+        }
+        .modal-content #imagePreview img {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            margin: auto;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div>ภาสนิน ครีบูล</div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>ข้อมูลแปลงมันสำปะหลัง</h1>
+            <button class="add-button" onclick="openModal()">เพิ่มข้อมูล</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อแปลง</th>
+                    <th>ขนาด (ไร่)</th>
+                    <th>รูปภาพ</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="plotData">
+                <!-- ข้อมูลจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h1>บันทึกข้อมูลแปลงมันสำปะหลัง</h1>
+            <form id="plotForm">
+                <div>
+                    <label for="plotName">ชื่อแปลง:</label>
+                    <input type="text" id="plotName" name="plotName" required>
+                </div>
+                <div>
+                    <label for="area">ขนาด (ไร่):</label>
+                    <input type="number" id="area" name="area" step="0.01" required>
+                </div>
+                <div>
+                    <label for="map">ตำแหน่งแปลง:</label>
+                    <div id="map"></div>
+                    <p id="mapInstructions">คลิกบนแผนที่เพื่อปักหมุดตำแหน่งแปลง</p>
+                </div>
+                <div>
+                    <label for="image">อัพโหลดรูปภาพ:</label>
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                    <div id="imagePreview
+                    <div id="imagePreview"></div>
+                </div>
+                <div class="button-container">
+                    <button type="submit">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let plots = [
+            { name: 'แปลง 1', area: 10.5, imageUrl: 'https://via.placeholder.com/100' },
+            { name: 'แปลง 2', area: 8.0, imageUrl: 'https://via.placeholder.com/100' },
+        ];
+        let map;
+        let marker;
+
+        function renderPlots() {
+            const tableBody = document.getElementById('plotData');
+            tableBody.innerHTML = '';
+
+            plots.forEach((plot, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${plot.name}</td>
+                    <td>${plot.area} ไร่</td>
+                    <td class="image-cell"><img src="${plot.imageUrl}" alt="Plot Image"></td>
+                    <td class="actions">
+                        <button class="edit-button" onclick="editPlot(${index})">แก้ไข</button>
+                        <button class="delete-button" onclick="deletePlot(${index})">ลบ</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function openModal() {
+            document.getElementById('myModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('myModal').style.display = "none";
+        }
+
+        function editPlot(index) {
+            const plot = plots[index];
+            document.getElementById('plotName').value = plot.name;
+            document.getElementById('area').value = plot.area;
+            // Assuming you want to use the existing image and location
+            document.getElementById('imagePreview').innerHTML = `<img src="${plot.imageUrl}" alt="Preview Image">`;
+            openModal();
+            // Additional logic to handle the map marker could be added here
+        }
+
+        function deletePlot(index) {
+            if (confirm('คุณต้องการลบแปลงนี้หรือไม่?')) {
+                plots.splice(index, 1);
+                renderPlots();
+            }
+        }
+
+        document.getElementById('plotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!marker) {
+                alert('กรุณาเลือกตำแหน่งแปลงบนแผนที่');
+                return;
+            }
+
+            const plotName = document.getElementById('plotName').value;
+            const area = document.getElementById('area').value;
+            const position = marker.getPosition();
+            const imageFile = document.getElementById('image').files[0];
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imageUrl = event.target.result;
+
+                const newPlot = {
+                    name: plotName,
+                    area: area,
+                    imageUrl: imageUrl,
+                    position: {
+                        lat: position.lat(),
+                        lng: position.lng()
+                    }
+                };
+
+                plots.push(newPlot);
+                renderPlots();
+                closeModal();
+            };
+
+            reader.readAsDataURL(imageFile);
+        });
+
+        document.getElementById('image').addEventListener('change', function() {
+            const imageFile = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imageUrl = event.target.result;
+                document.getElementById('imagePreview').innerHTML = `<img src="${imageUrl}" alt="Preview Image">`;
+            };
+            reader.readAsDataURL(imageFile);
+        });
+
+        function initMap() {
+            const initialPosition = { lat: 13.7563, lng: 100.5018 };
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: initialPosition,
+                zoom: 8
+            });
+
+            map.addListener('click', function(e) {
+                placeMarker(e.latLng);
+            });
+        }
+
+        function placeMarker(latLng) {
+            if (marker) {
+                marker.setPosition(latLng);
+            } else {
+                marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map
+                });
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        renderPlots();
+    </script>
+
+    <!-- ในการใช้งานจริง ให้แทนที่ YOUR_API_KEY ด้วย API Key ของคุณ -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</body>
+</html>

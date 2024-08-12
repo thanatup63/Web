@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงาน Cassava</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+        }
+        .navbar li {
+            margin-right: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+        .navbar a:hover, .navbar a.active {
+            color: #e2e8f0;
+            background-color: #2d3748;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #plotSelection, #dateSelection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div>ภาสนิน ครีบูล</div>
+    </nav>
+
+    <div class="container">
+        <h1>รายงาน</h1>
+        <div class="form-group">
+            <label for="reportType">เลือกประเภทรายงาน:</label>
+            <select id="reportType" onchange="toggleOptions()">
+                <option value="">-- เลือกประเภทรายงาน --</option>
+                <option value="production">ผลผลิต</option>
+                <option value="finance">รายรับรายจ่าย</option>
+            </select>
+        </div>
+        
+        <div id="plotSelection" class="form-group">
+            <label for="plot">เลือกแปลง:</label>
+            <select id="plot">
+                <option value="">-- เลือกแปลง --</option>
+                <option value="plot1">แปลง 1</option>
+                <option value="plot2">แปลง 2</option>
+                <option value="plot3">แปลง 3</option>
+            </select>
+        </div>
+        
+        <div id="dateSelection">
+            <div class="form-group">
+                <label for="startDate">วันเริ่มต้น:</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label for="endDate">วันสิ้นสุด:</label>
+                <input type="date" id="endDate">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button onclick="generateReport()">สร้างรายงาน</button>
+            <button onclick="exportToPDF()">ส่งออกเป็น PDF</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleOptions() {
+            const reportType = document.getElementById('reportType').value;
+            const plotSelection = document.getElementById('plotSelection');
+            const dateSelection = document.getElementById('dateSelection');
+            
+            if (reportType === 'production') {
+                plotSelection.style.display = 'block';
+                dateSelection.style.display = 'none';
+            } else if (reportType === 'finance') {
+                plotSelection.style.display = 'none';
+                dateSelection.style.display = 'block';
+            } else {
+                plotSelection.style.display = 'none';
+                dateSelection.style.display = 'none';
+            }
+        }
+
+        function generateReport() {
+            // Implement report generation logic here
+            alert('กำลังสร้างรายงาน...');
+        }
+
+        function exportToPDF() {
+            // Implement PDF export logic here
+            alert('กำลังส่งออกเป็น PDF...');
+        }
+    </script>
+</body>
+</html>

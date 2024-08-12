@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income and Expense Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Reset and base styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background-color: #f3f4f6; color: #1f2937; line-height: 1.5; }
+
+        /* Layout */
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .grid { display: grid; gap: 1.5rem; }
+        @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+
+        /* Navigation */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+            gap: 20px;
+        }
+        .navbar li {
+            margin-right: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+        .navbar a:hover, .navbar a.active {
+            text-decoration: underline;
+        }
+
+        /* Cards */
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .card-body { padding: 1.5rem; }
+        .card-title { font-size: 1.125rem; font-weight: 500; color: #1f2937; margin-bottom: 1rem; }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #4b5563; margin-bottom: 0.5rem; }
+        .form-input, .form-select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+        /* Graphs */
+        .graph-container { height: 300px; }
+
+        /* Summary */
+        .summary-grid { display: grid; gap: 2rem; }
+        @media (min-width: 640px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+        .summary-item-label { font-size: 0.875rem; font-weight: 500; color: #6b7280; }
+        .summary-item-value { font-size: 1.875rem; font-weight: 600; margin-top: 0.25rem; }
+        .summary-item-value.income { color: #059669; }
+        .summary-item-value.expense { color: #dc2626; }
+        .summary-item-value.profit { color: #2563eb; }
+
+        /* Utilities */
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div>ภาสนิน ครีบูล</div>
+    </nav>
+
+    <main class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <h1 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 1.5rem;">Income and Expense Analysis</h1>
+        
+        <div class="grid mb-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Filter by Date Range</h2>
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="start-date" class="form-label">Start Date</label>
+                            <input type="date" id="start-date" class="form-input" value="2023-01-01">
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date" class="form-label">End Date</label>
+                            <input type="date" id="end-date" class="form-input" value="2023-12-31">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Filter by Category</h2>
+                    <select id="category" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="income">Income</option>
+                        <option value="expenses">Expenses</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid mb-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Income Analysis Graph</h2>
+                    <div class="graph-container">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Expenses Analysis Graph</h2>
+                    <div class="graph-container">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Summary Report</h2>
+                <div class="summary-grid">
+                    <div>
+                        <div class="summary-item-label">Total Income</div>
+                        <div class="summary-item-value income">฿1,250,000</div>
+                    </div>
+                    <div>
+                        <div class="summary-item-label">Total Expenses</div>
+                        <div class="summary-item-value expense">฿850,000</div>
+                    </div>
+                    <div>
+                        <div class="summary-item-label">Net Profit/Loss</div>
+                        <div class="summary-item-value profit">฿400,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mock data for income
+        const incomeData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Income',
+                data: [80000, 120000, 90000, 150000, 100000, 130000, 110000, 140000, 95000, 85000, 75000, 75000],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        // Mock data for expenses
+        const expensesData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Expenses',
+                data: [50000, 70000, 60000, 90000, 80000, 85000, 75000, 95000, 70000, 65000, 55000, 55000],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        // Create income chart
+        const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+        new Chart(incomeCtx, {
+            type: 'bar',
+            data: incomeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '฿' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Create expenses chart
+        const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+        new Chart(expensesCtx, {
+            type: 'bar',
+            data: expensesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '฿' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cassava - พยากรณ์อากาศ</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+        }
+        .navbar li {
+            margin-right: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+        .navbar a:hover, .navbar a.active {
+            color: #e2e8f0;
+            background-color: #2d3748;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .weather-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .temperature {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .details {
+            margin-top: 20px;
+        }
+        .details p {
+            margin-bottom: 5px;
+        }
+        .forecast {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .forecast-item {
+            text-align: center;
+        }
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        .alert {
+            background-color: #f39c12;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div>ภาสนิน ครีบูล</div>
+    </nav>
+
+    <div class="container">
+        <h1>พยากรณ์อากาศ</h1>
+        <div class="weather-grid">
+            <div class="card">
+                <h2>สภาพอากาศวันนี้</h2>
+                <div class="weather-icon">☀️</div>
+                <div class="temperature" id="currentTemp">32°C</div>
+                <div class="details">
+                    <p>สภาพอากาศ: <span id="weatherDesc">แดดจัด</span></p>
+                    <p>ความชื้น: <span id="humidity">60%</span></p>
+                    <p>ความเร็วลม: <span id="windSpeed">10 km/h</span></p>
+                    <p>ทิศทางลม: <span id="windDirection">ตะวันออกเฉียงเหนือ</span></p>
+                    <p>ความกดอากาศ: <span id="pressure">1015 hPa</span></p>
+                    <p>ทัศนวิสัย: <span id="visibility">10 km</span></p>
+                    <p>ดัชนี UV: <span id="uvIndex">8 (สูง)</span></p>
+                </div>
+            </div>
+            <div class="card">
+                <h2>พยากรณ์อากาศ 5 วัน</h2>
+                <div class="forecast" id="forecast">
+                    <!-- จะถูกเติมด้วย JavaScript -->
+                </div>
+            </div>
+            <div class="card">
+                <h2>อุณหภูมิรายชั่วโมง</h2>
+                <div class="chart-container">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>ปริมาณน้ำฝนรายวัน</h2>
+                <div class="chart-container">
+                    <canvas id="rainfallChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="alert" id="weatherAlert">
+            <h3>การแจ้งเตือน</h3>
+            <p>ไม่มีการแจ้งเตือนสภาพอากาศรุนแรงในขณะนี้</p>
+        </div>
+    </div>
+
+    <script>
+        // ฟังก์ชันสุ่มข้อมูลสำหรับการจำลอง
+        function getRandomTemp() {
+            return Math.floor(Math.random() * 10) + 25;
+        }
+
+        function getRandomRainfall() {
+            return Math.floor(Math.random() * 50);
+        }
+
+        // อัพเดทข้อมูลสภาพอากาศปัจจุบัน
+        function updateCurrentWeather() {
+            document.getElementById('currentTemp').textContent = getRandomTemp() + '°C';
+            document.getElementById('humidity').textContent = Math.floor(Math.random() * 40 + 40) + '%';
+            document.getElementById('windSpeed').textContent = Math.floor(Math.random() * 20 + 5) + ' km/h';
+            document.getElementById('pressure').textContent = Math.floor(Math.random() * 30 + 1000) + ' hPa';
+            document.getElementById('visibility').textContent = Math.floor(Math.random() * 5 + 5) + ' km';
+            document.getElementById('uvIndex').textContent = Math.floor(Math.random() * 11) + ' (' + (Math.random() > 0.5 ? 'สูง' : 'ปานกลาง') + ')';
+        }
+
+        // สร้างพยากรณ์อากาศ 5 วัน
+        function createForecast() {
+            const forecastContainer = document.getElementById('forecast');
+            const days = ['อา', 'จ', 'อ', 'พ', 'พฤ'];
+            const icons = ['☀️', '⛅', '☁️', '🌧️', '⛈️'];
+            let forecastHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const temp = getRandomTemp();
+                forecastHTML += `
+                    <div class="forecast-item">
+                        <div>${days[i]}</div>
+                        <div>${icons[Math.floor(Math.random() * icons.length)]}</div>
+                        <div>${temp}°C</div>
+                    </div>
+                `;
+            }
+
+            forecastContainer.innerHTML = forecastHTML;
+        }
+
+        // สร้างกราฟอุณหภูมิรายชั่วโมง
+        function createTemperatureChart() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            const hours = Array.from({length: 24}, (_, i) => i + ':00');
+            const temperatures = Array.from({length: 24}, () => getRandomTemp());
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'อุณหภูมิ (°C)',
+                        data: temperatures,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // สร้างกราฟปริมาณน้ำฝนรายวัน
+        function createRainfallChart() {
+            const ctx = document.getElementById('rainfallChart').getContext('2d');
+            const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+            const rainfall = Array.from({length: 7}, () => getRandomRainfall());
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'ปริมาณน้ำฝน (มม.)',
+                        data: rainfall,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
+        window.onload = function() {
+            updateCurrentWeather();
+            createForecast();
+            createTemperatureChart();
+            createRainfallChart();
+
+            // อัพเดทข้อมูลทุก 5 นาที
+            setInterval(updateCurrentWeather, 300000);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cassava - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        body {
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+        }
+        .navbar li {
+            margin-right: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .stat {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .chart-container {
+            height: 300px;
+        }
+        .weather {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .weather-icon {
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div class="navbar-user">ภาสนิน ครีบูล</div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>สรุปการปลูก</h2>
+                <p>จำนวนแปลง: <span class="stat" id="plotCount">5</span></p>
+                <p>พื้นที่รวม: <span class="stat" id="totalArea">50</span> ไร่</p>
+                <p>ผลผลิตรวม: <span class="stat" id="totalProduction">100</span> ตัน</p>
+            </div>
+            <div class="card">
+                <h2>ผลผลิตรายเดือน</h2>
+                <div class="chart-container">
+                    <canvas id="productionChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>สภาพอากาศวันนี้</h2>
+                <div class="weather">
+                    <div class="weather-icon">☀️</div>
+                    <div>
+                        <p>อุณหภูมิ: <span class="stat" id="temperature">32°C</span></p>
+                        <p>ความชื้น: <span class="stat" id="humidity">60%</span></p>
+                        <p>โอกาสฝนตก: <span class="stat" id="rainChance">10%</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>รายรับ-รายจ่ายรายเดือน</h2>
+                <div class="chart-container">
+                    <canvas id="financeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // กราฟแสดงผลผลิต
+        const productionCtx = document.getElementById('productionChart').getContext('2d');
+        new Chart(productionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'],
+                datasets: [{
+                    label: 'ผลผลิต (ตัน)',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // กราฟแสดงรายรับ-รายจ่าย
+        const financeCtx = document.getElementById('financeChart').getContext('2d');
+        new Chart(financeCtx, {
+            type: 'line',
+            data: {
+                labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'],
+                datasets: [{
+                    label: 'รายรับ',
+                    data: [100000, 150000, 120000, 180000, 200000, 190000],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }, {
+                    label: 'รายจ่าย',
+                    data: [80000, 100000, 90000, 110000, 95000, 105000],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // อัพเดทข้อมูลแบบ Real-time (จำลอง)
+        function updateDashboard() {
+            document.getElementById('plotCount').textContent = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('totalArea').textContent = Math.floor(Math.random() * 100) + 1;
+            document.getElementById('totalProduction').textContent = Math.floor(Math.random() * 200) + 1;
+            document.getElementById('temperature').textContent = (Math.random() * 10 + 25).toFixed(1) + '°C';
+            document.getElementById('humidity').textContent = Math.floor(Math.random() * 40 + 40) + '%';
+            document.getElementById('rainChance').textContent = Math.floor(Math.random() * 100) + '%';
+        }
+
+        setInterval(updateDashboard, 5000); // อัพเดททุก 5 วินาที
+    </script>
+</body>
+</html>

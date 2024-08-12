@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลการเก็บเกี่ยว</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; line-height: 1.6; }
+
+        nav.navbar { background-color: #333; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar ul { list-style-type: none; display: flex; gap: 1.5rem; }
+        .navbar li { margin-right: 20px; }
+        .navbar a { color: white; text-decoration: none; }
+        .navbar a:hover, .navbar a.active { color: #e2e8f0; background-color: #2d3748; border-radius: 4px; padding: 0.5rem 1rem; }
+        .navbar .navbar-brand { font-size: 1.75rem; font-weight: bold; color: white; }
+        .navbar .navbar-user { font-size: 1rem; color: white; }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 2rem; background-color: #ffffff; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+        .header h1 { font-size: 1.5rem; color: #2d3748; }
+        .header .search-box { flex: 1; margin: 0 1rem; display: flex; align-items: center; }
+        .header .search-box select { width: 50%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem; text-align: center; transition: border-color 0.3s; }
+        .header .search-box select:focus { border-color: #4f46e5; outline: none; }
+
+        .button { background-color: #4CAF50; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 1rem; transition: background-color 0.3s; }
+        .button:hover { background-color: #45a049; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { border: 1px solid #d1d5db; padding: 1rem; text-align: left; }
+        th { background-color: #f4f4f4; color: #2d3748; font-weight: bold; }
+        td { background-color: #ffffff; }
+
+        .edit-button, .delete-button { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.3s; }
+        .edit-button { background-color: #4CAF50; color: white; }
+        .edit-button:hover { background-color: #45a049; }
+        .delete-button { background-color: #f44336; color: white; }
+        .delete-button:hover { background-color: #e53935; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Cassava</div>
+        <ul>
+            <li><a href="Dashbord.html">แดชบอร์ด</a></li>
+            <li><a href="DataCassava.html">ข้อมูลแปลง</a></li>
+            <li><a href="Cassava Harvesting.html">บันทึกการเก็บเกี่ยว</a></li>
+            <li><a href="weather.html">พยากรณ์อากาศ</a></li>
+            <li><a href="Income and Expense_table.html">รายรับรายจ่าย</a></li>
+            <li><a href="Income and Expense Analysis.html">สรุปรายรับรายจ่าย</a></li>
+            <li><a href="Report.html">รายงาน</a></li>
+        </ul>
+        <div class="navbar-user">ภาสนิน ครีบูล</div>
+    </nav>
+
+    <div class="container">
+        <h1>ข้อมูลการเก็บเกี่ยวมันสำปะหลัง</h1>
+        <div class="header">
+            <div class="search-box">
+                <select id="search-field" class="form-input" onchange="filterTable()">
+                    <option value="">ค้นหาตามชื่อไร่/แปลง</option>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <a href="Cassava Harvesting Process.html" class="button">เพิ่มข้อมูลการเก็บเกี่ยว</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อไร่/แปลง</th>
+                    <th>พื้นที่ (ไร่)</th>
+                    <th>วันที่เก็บเกี่ยว</th>
+                    <th>ผลผลิต (กิโลกรัม)</th>
+                    <th>เปอร์เซ็นต์แป้ง (%)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="harvest-table-body">
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const harvestData = JSON.parse(localStorage.getItem('harvestData')) || [
+                { fieldName: 'Field A', fieldArea: 2.5, harvestDate: '2024-07-15', yield: 3000, starchPercentage: 18 },
+                { fieldName: 'Field B', fieldArea: 3.0, harvestDate: '2024-07-20', yield: 3500, starchPercentage: 20 },
+                { fieldName: 'Field C', fieldArea: 1.8, harvestDate: '2024-08-05', yield: 2700, starchPercentage: 16 },
+                { fieldName: 'Field D', fieldArea: 4.0, harvestDate: '2024-08-10', yield: 4000, starchPercentage: 21 },
+                { fieldName: 'Field E', fieldArea: 2.2, harvestDate: '2024-08-15', yield: 2900, starchPercentage: 17 },
+                { fieldName: 'Field F', fieldArea: 2.9, harvestDate: '2024-09-01', yield: 3100, starchPercentage: 19 },
+                { fieldName: 'Field G', fieldArea: 3.5, harvestDate: '2024-09-10', yield: 3600, starchPercentage: 22 },
+                { fieldName: 'Field H', fieldArea: 1.7, harvestDate: '2024-09-15', yield: 2800, starchPercentage: 15 },
+                { fieldName: 'Field I', fieldArea: 3.1, harvestDate: '2024-10-01', yield: 3200, starchPercentage: 20 },
+                { fieldName: 'Field J', fieldArea: 2.8, harvestDate: '2024-10-10', yield: 3000, starchPercentage: 18 },
+            ];
+
+            const tableBody = document.getElementById('harvest-table-body');
+            const searchField = document.getElementById('search-field');
+
+            function renderTable(data) {
+                tableBody.innerHTML = '';
+                data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.fieldName}</td>
+                        <td>${item.fieldArea}</td>
+                        <td>${formatDate(item.harvestDate)}</td>
+                        <td>${item.yield}</td>
+                        <td>${item.starchPercentage}</td>
+                        <td>
+                            <button class="edit-button" onclick="editData(${index})">แก้ไข</button>
+                            <button class="delete-button" onclick="deleteData(${index})">ลบ</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function renderOptions(data) {
+                const uniqueFields = [...new Set(data.map(item => item.fieldName))];
+                searchField.innerHTML = '<option value="">ค้นหาตามชื่อไร่/แปลง</option>';
+                uniqueFields.forEach(fieldName => {
+                    const option = document.createElement('option');
+                    option.value = fieldName;
+                    option.textContent = fieldName;
+                    searchField.appendChild(option);
+                });
+            }
+
+            function filterTable() {
+                const query = searchField.value;
+                const filteredData = harvestData.filter(item => item.fieldName === query || query === '');
+                renderTable(filteredData);
+            }
+
+            function deleteData(index) {
+                if (confirm('คุณแน่ใจหรือว่าต้องการลบข้อมูลนี้?')) {
+                    harvestData.splice(index, 1);
+                    localStorage.setItem('harvestData', JSON.stringify(harvestData));
+                    renderTable(harvestData);
+                    renderOptions(harvestData);
+                }
+            }
+
+            function editData(index) {
+                const updatedItem = prompt('กรุณากรอกข้อมูลใหม่ (JSON format)', JSON.stringify(harvestData[index]));
+                if (updatedItem) {
+                    try {
+                        const parsedItem = JSON.parse(updatedItem);
+                        harvestData[index] = parsedItem;
+                        localStorage.setItem('harvestData', JSON.stringify(harvestData));
+                        renderTable(harvestData);
+                        renderOptions(harvestData);
+                    } catch (e) {
+                        alert('กรุณากรอกข้อมูลในรูปแบบ JSON ที่ถูกต้อง');
+                    }
+                }
+            }
+
+            function formatDate(dateString) {
+                const [year, month, day] = dateString.split('-');
+                return `${day}/${month}/${year}`;
+            }
+
+            renderTable(harvestData);
+            renderOptions(harvestData);
+        });
+    </script>
+</body>
+</html>

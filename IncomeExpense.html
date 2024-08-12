@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cassava - รายรับรายจ่าย</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: #ddd;
+            margin-right: 5px;
+            border-radius: 4px;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .form-group, .form-row > div {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: fle;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+        .income button.save {
+            background-color: #4CAF50;
+        }
+        .expense button.save {
+            background-color: #4CAF50;
+        }
+        button.back {
+            background-color: #f44336;
+        }
+        button.save{
+            background-color: #4CAF50;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>รายรับรายจ่าย</h1>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('income')">รายรับ</div>
+            <div class="tab" onclick="showTab('expense')">รายจ่าย</div>
+        </div>
+
+        <div id="income-section">
+            <h2>รายรับ</h2>
+            <form id="income-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="income-category">หมวดหมู่:</label>
+                        <select id="income-category">
+                            <option value="">เลือกหมวดหมู่</option>
+                            <option value="ขายผลผลิต">ขายผลผลิต</option>
+                            <option value="เบี้ยเลี้ยง">เบี้ยเลี้ยง</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="income-amount">จำนวนเงิน:</label>
+                        <input type="number" id="income-amount">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="income-date">วันที่:</label>
+                        <input type="date" id="income-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="income-note">รายละเอียด:</label>
+                        <input type="text" id="income-note">
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="save" onclick="confirmAndAdd('income')">บันทึก</button>
+                    <button type="button" class="back" onclick="goBack()">กลับ</button>
+                </div>
+            </form>
+            <div id="income-output">
+                <!-- รายรับจะแสดงที่นี่ -->
+            </div>
+        </div>
+
+        <div id="expense-section" class="hidden">
+            <h2>รายจ่าย</h2>
+            <form id="expense-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expense-category">หมวดหมู่:</label>
+                        <select id="expense-category">
+                            <option value="">เลือกหมวดหมู่</option>
+                            <option value="ปุ๋ย">ปุ๋ย</option>
+                            <option value="เครื่องมือ">เครื่องมือ</option>
+                            <option value="แรงงาน">แรงงาน</option>
+                            <option value="ยาฆ่าแมลง">ยาฆ่าแมลง</option>
+                            <option value="ค่าน้ำ">ค่าน้ำ</option>
+                            <option value="ค่าไฟฟ้า">ค่าไฟฟ้า</option>
+                            <option value="เชื้อเพลิง">เชื้อเพลิง</option>
+                            <option value="ขนส่ง">ขนส่ง</option>
+                            <option value="ซ่อมแซม">ซ่อมแซม</option>
+                            <option value="อื่น ๆ">อื่น ๆ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-amount">จำนวนเงิน:</label>
+                        <input type="number" id="expense-amount">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expense-date">วันที่:</label>
+                        <input type="date" id="expense-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-note">รายละเอียด:</label>
+                        <input type="text" id="expense-note">
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="save" onclick="confirmAndAdd('expense')">บันทึก</button>
+                    <button type="button" class="back" onclick="goBack()">กลับ</button>
+                </div>
+            </form>
+            <div id="expense-output">
+                <!-- รายจ่ายจะแสดงที่นี่ -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            if (tabName === 'income') {
+                document.getElementById('income-section').classList.remove('hidden');
+                document.getElementById('expense-section').classList.add('hidden');
+                document.querySelector('.tab.active').classList.remove('active');
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+            } else if (tabName === 'expense') {
+                document.getElementById('income-section').classList.add('hidden');
+                document.getElementById('expense-section').classList.remove('hidden');
+                document.querySelector('.tab.active').classList.remove('active');
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+            }
+        }
+
+        function confirmAndAdd(type) {
+            let category, amount, date, note, formId, outputId;
+
+            if (type === 'income') {
+                category = document.querySelector('#income-category').value;
+                amount = document.querySelector('#income-amount').value;
+                date = document.querySelector('#income-date').value;
+                note = document.querySelector('#income-note').value;
+                formId = 'income-form';
+                outputId = 'income-output';
+            } else if (type === 'expense') {
+                category = document.querySelector('#expense-category').value;
+                amount = document.querySelector('#expense-amount').value;
+                date = document.querySelector('#expense-date').value;
+                note = document.querySelector('#expense-note').value;
+                formId = 'expense-form';
+                outputId = 'expense-output';
+            }
+
+            if (category && amount && date) {
+                if (confirm('คุณต้องการบันทึกข้อมูลนี้ใช่หรือไม่?')) {
+                    addRecord(type, category, amount, date, note, outputId);
+                }
+            } else {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            }
+        }
+
+        function addRecord(type, category, amount, date, note, outputId) {
+            const outputDiv = document.getElementById(outputId);
+            const newEntry = document.createElement('div');
+
+            newEntry.innerHTML = `
+                <p><strong>${type === 'income' ? 'รายรับ' : 'รายจ่าย'}:</strong> ${date} | หมวดหมู่: ${category} | รายละเอียด: ${note} | จำนวนเงิน: ${amount} บาท</p>
+            `;
+
+            outputDiv.appendChild(newEntry);
+            document.getElementById(type + '-form').reset();
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
